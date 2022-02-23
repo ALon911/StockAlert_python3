@@ -64,7 +64,7 @@ while(sizeOfList != counter):
         for obj in list:
             if obj.direction == 'up':
                 if (obj.checkPrice() >= obj.targetValue and obj.flag !=1):
-                    # obj.sendSMS()
+                    obj.sendSMS()
                     obj.flag = 1
                     counter+=1
                 else:
