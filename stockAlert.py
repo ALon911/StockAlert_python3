@@ -10,23 +10,29 @@ import datetime as dt
 import vonage
 import os
 from dotenv import load_dotenv
+import smtplib, ssl
+
 
 
 class StockAlert:
-    
+    load_dotenv()
+    NUMBER_ENV = os.getenv('NUMBER')
+    KEY_ENV = os.getenv('KEY')
+    SECRET_ENV = os.getenv('SECRET')
+    port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    sender_email = os.getenv('SENDER_EMAIL_ENV')  # Enter your address
+    receiver_email = os.getenv('RECEIVER_EMAIL_ENV')   # Enter receiver address
+    GMAIL_PASS_ENV = os.getenv('GMAIL_PASS')
+
     
     def __init__(self, direction, stockTicker='IOTA', targetValue=1.8 ):
-        
-
-
-        load_dotenv()
+    
         self.stockTicker = stockTicker
         self.targetValue = targetValue
         self.direction = direction
         self.flag = 0
-        self.NUMBER_ENV = os.getenv('NUMBER')
-        self.KEY_ENV = os.getenv('KEY')
-        self.SECRET_ENV = os.getenv('SECRET')
+  
 
     def checkPrice(self):
         r = requests.get("https://api.binance.com/api/v3/ticker/24hr?symbol="+self.stockTicker+"USDT")
@@ -50,6 +56,18 @@ class StockAlert:
                 "text": msg,
             }
         )
+    def sendMail(self):
+            SUBJECT = "Stock Alert from Alon's Python3 Script"
+            TEXT = f"""
+            exec ! {self.stockTicker} {str(self.lastPrice)} target price:  {str(self.targetValue)} 
+                       direction {self.direction}
+                        """
+            message = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL(self.smtp_server, self.port, context=context) as server:
+                server.login(self.sender_email, self.GMAIL_PASS_ENV)
+                server.sendmail(self.sender_email, self.receiver_email, message)
+
 list = []
 stocks = [
     {'symbol': 'IOTA', 'price': 1.7 , 'direction': 'up'}, 
@@ -59,12 +77,15 @@ for obj in stocks:
     list.append(StockAlert(obj['direction'] or 'up', obj['symbol'], obj['price'] ))
 sizeOfList = len(list)
 counter = 0
+minutes = 5 #minutes of sleep after each check
+
 while(sizeOfList != counter):
   
         for obj in list:
             if obj.direction == 'up':
                 if (obj.checkPrice() >= obj.targetValue and obj.flag !=1):
                     obj.sendSMS()
+                    obj.sendMail()
                     obj.flag = 1
                     counter+=1
                 else:
@@ -76,6 +97,7 @@ while(sizeOfList != counter):
                  
                 if (obj.checkPrice() <= obj.targetValue and obj.flag !=1):
                     obj.sendSMS()
+                    obj.sendMail()
                     obj.flag = 1
                     counter+=1
                     print("exec !"+ obj.stockTicker + " " + str(obj.lastPrice) + " target price: " +  str(obj.targetValue) + 
@@ -91,4 +113,4 @@ while(sizeOfList != counter):
 
 
  
-        time.sleep(300)
+        time.sleep(minutes * 60)
