@@ -29,7 +29,7 @@ class StockAlert:
     GMAIL_PASS_ENV = os.getenv('GMAIL_PASS')
 
     
-    def __init__(self, direction, stockTicker='IOTA', targetValue=1.8 ):
+    def __init__(self, direction, stockTicker, targetValue ):
     
         self.stockTicker = stockTicker
         self.targetValue = targetValue
