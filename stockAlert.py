@@ -12,7 +12,10 @@ import os
 from dotenv import load_dotenv
 import smtplib, ssl
 
-
+stocks = [
+    {'symbol': 'XRP', 'price': 1.7 , 'direction': 'up'}, 
+    {'symbol': 'XRP', 'price': 0.8 , 'direction': 'down'}, 
+    ]
 
 class StockAlert:
     load_dotenv()
@@ -69,10 +72,7 @@ class StockAlert:
                 server.sendmail(self.sender_email, self.receiver_email, message)
 
 list = []
-stocks = [
-    {'symbol': 'IOTA', 'price': 1.7 , 'direction': 'up'}, 
-    {'symbol': 'IOTA', 'price': 0.8 , 'direction': 'down'}, 
-    ]
+
 for obj in stocks:
     list.append(StockAlert(obj['direction'] or 'up', obj['symbol'], obj['price'] ))
 sizeOfList = len(list)
