@@ -12,10 +12,13 @@ import os
 from dotenv import load_dotenv
 import smtplib, ssl
 
+
+minutes = 5 #minutes of sleep after each check
 stocks = [
     {'symbol': 'XRP', 'price': 1.7 , 'direction': 'up'}, 
     {'symbol': 'XRP', 'price': 0.8 , 'direction': 'down'}, 
     ]
+
 
 class StockAlert:
     load_dotenv()
@@ -77,7 +80,7 @@ for obj in stocks:
     list.append(StockAlert(obj['direction'] or 'up', obj['symbol'], obj['price'] ))
 sizeOfList = len(list)
 counter = 0
-minutes = 5 #minutes of sleep after each check
+
 
 while(sizeOfList != counter):
   
@@ -88,9 +91,9 @@ while(sizeOfList != counter):
                     obj.sendMail()
                     obj.flag = 1
                     counter+=1
+                    print(f"exec! {str(minutes)} minutes..  {obj.stockTicker} {str(obj.lastPrice)}  target price:  {str(obj.targetValue)} , direction: {obj.direction}")  
                 else:
-                    print("sleeping 5 minutes.. "+ obj.stockTicker + " " + str(obj.lastPrice) + " target price: " +  str(obj.targetValue) + 
-                        ' ' + obj.direction)
+                    print(f"sleeping {str(minutes)} minutes..  {obj.stockTicker} {str(obj.lastPrice)}  target price:  {str(obj.targetValue)} , direction: {obj.direction}")
 
                             
             if obj.direction == 'down': 
@@ -100,11 +103,9 @@ while(sizeOfList != counter):
                     obj.sendMail()
                     obj.flag = 1
                     counter+=1
-                    print("exec !"+ obj.stockTicker + " " + str(obj.lastPrice) + " target price: " +  str(obj.targetValue) + 
-                        ' ' + obj.direction)    
+                    print(f"exec! {str(minutes)} minutes..  {obj.stockTicker} {str(obj.lastPrice)}  target price:  {str(obj.targetValue)} , direction: {obj.direction}")  
                 else:
-                    print("sleeping 5 minutes.. "+ obj.stockTicker + " " + str(obj.lastPrice) + " target price: " +  str(obj.targetValue) + 
-                        ' ' + obj.direction)    
+                    print(f"sleeping {str(minutes)} minutes..  {obj.stockTicker} {str(obj.lastPrice)}  target price:  {str(obj.targetValue)} , direction: {obj.direction}")
                 
         print('counter ' + str(counter))
         
